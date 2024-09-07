@@ -1,0 +1,30 @@
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Login to Fly.io
+        uses: fly-io/flyctl-action@v1
+        with:
+          fly_api_token: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Deploy to Fly.io
+        run: fly deploy --remote-only
+
+      - name: Set environment variables
+        run: fly secrets set PORT=3000
+
+      - name: Restart app
+        run: fly restart
